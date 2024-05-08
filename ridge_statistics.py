@@ -28,6 +28,8 @@ def return_statistics(ridges_data):
 
 
         run = z_coords.max() - z_coords.min()
+        if run==0:
+            continue
 
         slopes_y[i] = (y_coords.max()-y_coords.min()) / run
         slopes_x[i] = (x_coords.max()-x_coords.min()) / run
@@ -35,8 +37,11 @@ def return_statistics(ridges_data):
 
 
 
-    x_slope = (slopes_x[np.isnan(slopes_x)!=True].mean(), slopes_x[np.isnan(slopes_x)!=True].std())
-    y_slope = (slopes_y[np.isnan(slopes_y)!=True].mean(), slopes_y[np.isnan(slopes_y)!=True].std())
+    x_mask = np.logical_and(np.isnan(slopes_x)==False, np.isinf(slopes_x)==False)
+    y_mask = np.logical_and(np.isnan(slopes_y)==False, np.isinf(slopes_y)==False)
+
+    x_slope = (slopes_x[x_mask].mean(), slopes_x[x_mask].std())
+    y_slope = (slopes_y[y_mask].mean(), slopes_y[y_mask].std())
 
     #Compute the density
     flattened_ridges = np.reshape(ridges_data, -1)
@@ -49,7 +54,7 @@ def return_statistics(ridges_data):
 
 if __name__ == "__main__":
 
-    ridges_path = "C:/Users/malth/Documents/DTU/Sjette Semester/Bachelor/Data/mask_03_v2.tif"
+    ridges_path = "C:/Users/malth/Documents/DTU/Sjette Semester/Bachelor/Data/annotated2.tif"
     ridges_data = tif.imread(ridges_path)
 
     density, thickness, x_slope, y_slope = return_statistics(ridges_data=ridges_data)
