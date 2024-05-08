@@ -29,47 +29,29 @@ if __name__ == "__main__":
 
     images = [image_0, image_1, image_2]
     masks = [mask_0, mask_1, mask_2]
-    results = [np.zeros((M, N, C))]*3
+    results = [np.zeros((M, N, C))]*3 #I don't remember why I did this, TODO: fix it?
 
 
-    for ax in range(1,2):
-        for i in tqdm(range(M)):
-            img_i = Image.fromarray(images[ax][i]).convert('RGB')
+    for i in tqdm(range(M)):
+        img_i = Image.fromarray(images[1][i]).convert('RGB')
 
-            _, cc, stats, _ = cv2.connectedComponentsWithStats(masks[ax][i])
+        _, cc, stats, _ = cv2.connectedComponentsWithStats(masks[1][i])
 
-            to_keep = np.squeeze(np.argwhere(stats[:,4]>10))
-            #cc[cc in ]
-            for k in range(1,len(to_keep)):
-                keep_val = to_keep[k]
-                cc[cc==keep_val] = 255
-            
-            cc[cc<255] = 0
+        to_keep = np.squeeze(np.argwhere(stats[:,4]>10))
 
-            mask_i_dilated = cv2.dilate(cc.astype(np.uint8), d_kernel, iterations=2)
+        for k in range(1,len(to_keep)): #Get rid of connected components smaller than a threshold, so inpainting does not inpaint blobs in the backgroudn
+            keep_val = to_keep[k]
+            cc[cc==keep_val] = 255
+        
+        cc[cc<255] = 0
 
-            mask_i = Image.fromarray(mask_i_dilated, mode="L")
+        mask_i_dilated = cv2.dilate(cc.astype(np.uint8), d_kernel, iterations=2) #Dilate for better inpainting
 
-            #img_i.show()
-            #mask_i.show()
-            results[ax][i] = np.array(simple_lama(img_i, mask_i).convert('L'))[3:503,3:503]
+        mask_i = Image.fromarray(mask_i_dilated, mode="L")
 
-#roll back
-results[0] = np.rollaxis(results[0], axis=1)
-results[2] = np.transpose(np.rollaxis(np.rollaxis(results[2], axis=1),axis=1))
-
-#Image.fromarray(results[0][5]).show()
-#Image.fromarray(results[1][5]).show()
-#Image.fromarray(results[2][5]).show()
+        results[1][i] = np.array(simple_lama(img_i, mask_i).convert('L'))[3:503,3:503] #Get rid of padding
 
 
-#result = np.max([results[0], results[1], results[2]], axis=0).astype(np.uint8)
+    result = (results[1]).astype(np.uint8)
 
-result = (results[1]).astype(np.uint8)
-
-#####??????????
-test = Image.fromarray(result[4]).convert('L')
-
-test.show()
-
-tif.imwrite(save_path+"inpaint_01_v2.tif", result)
+    tif.imwrite(save_path+"inpaint_01_v2.tif", result)
