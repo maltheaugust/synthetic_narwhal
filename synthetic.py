@@ -205,12 +205,3 @@ if __name__ == "__main__":
 
     color_and_combine(save_path=save_path, ridges_path=ridges_path, inpaint_path=inpaint_path)
 
-
-
-
-    #NOTE:
-    #   - Currently the wind noise is not added to the mask
-
-
-    #Ideas:
-    #   -Dilate more in inpainting?
