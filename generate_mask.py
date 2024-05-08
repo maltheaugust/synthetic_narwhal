@@ -8,7 +8,7 @@ import tifffile as tif
 import SimpleITK as sitk
 import perlin
 from skimage.morphology import skeletonize_3d
-from scipy.ndimage import convolve, gaussian_filter
+from scipy.ndimage import  gaussian_filter
 
 
 
@@ -29,10 +29,6 @@ def apply_noise(data):
     noisy_data = gaussian_filter(noisy_data, sigma=3, radius=1)
     noisy_data = gaussian_filter(noisy_data, sigma=2, radius=1)
     noisy_data[noisy_data > 0] = 1
-    #noisy_data.astype(np.float32)
-
-    #noisy_data = convolve(noisy_data, kernel, mode = "constant", cval=0)
-
 
     return noisy_data.astype(np.uint8)
 
@@ -160,7 +156,6 @@ def generate_ridge():
 
 
     #Is this perlin noise wack????? yes but it works
-    #NOTE: omega range was [0.05, 0.4]
 
     z = np.round(sine[0], decimals=5).astype(np.int32)
 
@@ -206,7 +201,6 @@ def populate_data(data, ridge_positions):
 
 
         x, x2, y, y2, z = generate_ridge()
-        #x3, x4, y3, y4, z2 = generate_ridge()
 
         x += x_origin
         x2 += x_origin
@@ -276,19 +270,6 @@ if __name__ == "__main__":
     mask = mask.astype(np.uint8)
 
     tif.imwrite("C:/Users/malth/Documents/DTU/Sjette Semester/Bachelor/Data/mask_05_v2.tif", mask)
-
-
-
-
-#TODO:
-#Improving the ridges:
-#   -Add different noise?
-#   -Consider attempting placing a new ridge, if the ridge touches another
-#
-#Finish the data:
-#   -Distance transform
-#   -Merge with inpainted background
-
 
 
 
